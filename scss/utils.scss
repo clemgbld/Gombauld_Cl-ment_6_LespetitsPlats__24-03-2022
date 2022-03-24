@@ -1,0 +1,28 @@
+// color
+$tools: #ed6454;
+$ingredients: #3282f7;
+$devices: #68d9a4;
+
+$light-background: #e7e7e7;
+$dark-background: #c7bebe;
+
+
+
+// mixin
+@mixin flex--full-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@mixin flex-container($gap) {
+  display: flex;
+  align-items: center;
+  gap: $gap;
+}
+
+@mixin filter-container($gap) {
+    @include flex-container($gap);
+    flex-wrap: wrap;
+    margin-bottom: 1.6rem;
+}
