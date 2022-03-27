@@ -1,5 +1,10 @@
 import { recipes } from "./data/recipes.js";
+
 import Recipe from "./models/Recipe.js";
+
+import { BLUE, GREEN, RED } from "./types/colorTypes.js";
+
+import Select from "./templates/select.js";
 
 class App {
   constructor() {
@@ -46,10 +51,9 @@ class App {
 
   async init() {
     await this.fetchData();
-    console.log("Recipes", this.Recipes);
-    console.log("All ingredients", this.AllIngredients);
-    console.log("All appliance", this.AllAppliance);
-    console.log("All ustensils", this.AllUstensils);
+    const IngredientsSelect = new Select(this.AllIngredients, BLUE);
+    const DevicesSelect = new Select(this.AllAppliance, GREEN);
+    const ToolsSelect = new Select(this.AllUstensils, RED);
   }
 }
 

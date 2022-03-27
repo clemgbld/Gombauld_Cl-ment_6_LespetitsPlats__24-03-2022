@@ -41,9 +41,11 @@
       <section class="search">
         <form method="get" class="search__form">
           <div class="search__control">
+            <label class="sr-only" for="search">search</label>
             <input
               type="text"
               class="search__input"
+              id="search"
               placeholder="Rechercher une recette"
             />
             <button type="submit" class="search__btn">
@@ -56,26 +58,80 @@
         <div class="tags">
           <!-- <div class="tags__tag tags__tag--blue">
             <p class="tags__name">Coco</p>
-            <ion-icon class="tags__icon" name="close-circle-outline"></ion-icon>
+            <div class="tags__icon">
+              <ion-icon name="close-circle-outline"></ion-icon>
+            </div>
           </div> -->
         </div>
         <div class="selects">
-          <div class="selects__select selects__select--blue">
-            <h3 class="selects__title">Ingredients</h3>
-            <div class="selects__icon">
-              <ion-icon name="chevron-down-outline"></ion-icon>
+          <div class="selects__wrapper selects__wrapper--blue">
+            <div class="selects__absolute">
+              <div class="selects__select selects__select--blue">
+                <div class="selects__flex">
+                  <h3 class="selects__title">Ingredients</h3>
+                  <form class="selects__form hidden">
+                    <label class="sr-only" for="search-ingredients"></label>
+                    <input
+                      type="text"
+                      class="selects__search"
+                      id="search-ingredients"
+                      placeholder="Rechercher un ingredient"
+                    />
+                  </form>
+
+                  <div class="selects__icon">
+                    <ion-icon name="chevron-down-outline"></ion-icon>
+                  </div>
+                </div>
+              </div>
+              <ul class="selects__tags selects__tags--blue hidden"></ul>
             </div>
           </div>
-          <div class="selects__select selects__select--green">
-            <h3 class="selects__title">Appareils</h3>
-            <div class="selects__icon">
-              <ion-icon name="chevron-down-outline"></ion-icon>
+
+          <div class="selects__wrapper selects__wrapper--green">
+            <div class="selects__absolute">
+              <div class="selects__select selects__select--green">
+                <div class="selects__flex">
+                  <h3 class="selects__title">Appareils</h3>
+                  <form class="selects__form hidden">
+                    <label class="sr-only" for="search-devices"></label>
+                    <input
+                      type="text"
+                      class="selects__search"
+                      id="search-devices"
+                      placeholder="Rechercher un ingredient"
+                    />
+                  </form>
+
+                  <div class="selects__icon">
+                    <ion-icon name="chevron-down-outline"></ion-icon>
+                  </div>
+                </div>
+              </div>
+              <ul class="selects__tags selects__tags--green hidden"></ul>
             </div>
           </div>
-          <div class="selects__select selects__select--red">
-            <h3 class="selects__title">Ustensiles</h3>
-            <div class="selects__icon">
-              <ion-icon name="chevron-down-outline"></ion-icon>
+          <div class="selects__wrapper selects__wrapper--red">
+            <div class="selects__absolute">
+              <div class="selects__select selects__select--red">
+                <div class="selects__flex">
+                  <h3 class="selects__title">Utstensils</h3>
+                  <form class="selects__form hidden">
+                    <label class="sr-only" for="search-tools"></label>
+                    <input
+                      type="text"
+                      class="selects__search"
+                      id="search-tools"
+                      placeholder="Rechercher un ingredient"
+                    />
+                  </form>
+
+                  <div class="selects__icon">
+                    <ion-icon name="chevron-down-outline"></ion-icon>
+                  </div>
+                </div>
+              </div>
+              <ul class="selects__tags selects__tags--red hidden"></ul>
             </div>
           </div>
         </div>
