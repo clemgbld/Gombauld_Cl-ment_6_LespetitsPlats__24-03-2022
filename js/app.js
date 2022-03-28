@@ -9,6 +9,7 @@ import Select from "./templates/select.js";
 class App {
   constructor() {
     this.Recipes = [];
+    this.RecipesFiltered = [];
     this.AllIngredients = [];
     this.AllAppliance = [];
     this.AllUstensils = [];
@@ -42,6 +43,8 @@ class App {
       this.Recipes.push(new Recipe(recipe));
     });
 
+    this.RecipesFiltered = this.Recipes;
+
     this.getAllIngredients();
     this.getAllAppliance();
     this.getAllUstensils();
@@ -51,6 +54,7 @@ class App {
 
   async init() {
     await this.fetchData();
+    console.log(this.AllIngredients);
     const IngredientsSelect = new Select(this.AllIngredients, BLUE);
     const DevicesSelect = new Select(this.AllAppliance, GREEN);
     const ToolsSelect = new Select(this.AllUstensils, RED);

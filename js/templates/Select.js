@@ -80,12 +80,40 @@ class Select {
     const NewTag = new Tag(tag.id, this.type);
   }
 
-  init() {
-    const tagsList = this.tags.map(
+  fillTagsContainer(tags) {
+    const tagsList = tags.map(
       (word) =>
         `<li class="selects__tag selects__tag--${this.type}" id="${word}">${word}</li>`
     );
+
+    this.$tagsContainer.innerHTML = "";
+
     tagsList.forEach((tag) => (this.$tagsContainer.innerHTML += tag));
+
+    const createTag = (e) => {
+      e.stopPropagation();
+      this.createTag(e.target);
+    };
+
+    document
+      .querySelectorAll(`.selects__tag--${this.type}`)
+      .forEach((tag) => tag.addEventListener("click", (e) => createTag(e)));
+  }
+
+  filterTags(e) {
+    const tags = this.tags.filter((tag) =>
+      tag.toLowerCase().includes(e.target.value.toLowerCase())
+    );
+
+    const fillTagsContainer = () => {
+      this.fillTagsContainer(tags);
+    };
+
+    fillTagsContainer();
+  }
+
+  init() {
+    this.fillTagsContainer(this.tags);
 
     const toggleExpend = (e) => {
       e.stopPropagation();
@@ -105,17 +133,15 @@ class Select {
       this.resetSelect();
     };
 
-    const createTag = (e) => {
-      e.stopPropagation();
-      this.createTag(e.target);
+    const filterTags = (e) => {
+      this.filterTags(e);
     };
 
     this.$btn.addEventListener("click", toggleExpend);
     this.$title.addEventListener("click", setActive);
     document.addEventListener("click", resetSelect);
-    document
-      .querySelectorAll(`.selects__tag--${this.type}`)
-      .forEach((tag) => tag.addEventListener("click", (e) => createTag(e)));
+    this.$input.addEventListener("input", (e) => filterTags(e));
+    this.$form.addEventListener("submit", (e) => e.preventDefault());
   }
 }
 
