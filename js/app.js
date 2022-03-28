@@ -24,6 +24,7 @@ class App {
     this.AllIngredients = [];
     this.AllAppliance = [];
     this.AllUstensils = [];
+    this.searchTerm = "";
 
     this.CardContainer = new CardContainer();
 
@@ -32,10 +33,15 @@ class App {
     this.Filter = new Filter();
   }
 
-  filterRecipes(data) {
-    console.log(data);
-
+  filterRecipes(searchTerm) {
+    const LastSearchTerm = this.searchTerm;
+    console.log(searchTerm);
+    this.searchTerm = searchTerm;
+    const isSearchTermLongerThan3 = this.searchTerm.length >= 3;
+    const isAddingChars = searchTerm.length > LastSearchTerm;
     this.CardContainer.clearContainer();
+
+    if (!isSearchTermLongerThan3) return;
   }
 
   getAllIngredients(recipes) {
