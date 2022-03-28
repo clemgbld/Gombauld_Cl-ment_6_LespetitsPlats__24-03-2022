@@ -21,7 +21,21 @@ class Recipe {
     return this._servings;
   }
   get ingredients() {
-    return this._ingredients;
+    const ingredients = this._ingredients.map((ingredient) => {
+      return {
+        ingredient: ingredient.ingredient,
+        ...(ingredient.quantity && {
+          quantity: ingredient.quantity,
+        }),
+        ...(ingredient.unit && {
+          unit: ingredient.unit.includes("grammes")
+            ? ingredient.unit.replace("grammes", "g")
+            : ingredient.unit,
+        }),
+      };
+    });
+
+    return ingredients;
   }
   get time() {
     return this._time;

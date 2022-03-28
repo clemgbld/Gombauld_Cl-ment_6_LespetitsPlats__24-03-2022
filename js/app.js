@@ -5,6 +5,8 @@ import Recipe from "./models/Recipe.js";
 import { BLUE, GREEN, RED } from "./types/colorTypes.js";
 
 import Select from "./templates/select.js";
+import CardContainer from "./templates/CardContainer.js";
+import Card from "./templates/Card.js";
 
 class App {
   constructor() {
@@ -13,6 +15,8 @@ class App {
     this.AllIngredients = [];
     this.AllAppliance = [];
     this.AllUstensils = [];
+
+    this.CardContainer = new CardContainer();
   }
 
   getAllIngredients() {
@@ -54,7 +58,9 @@ class App {
 
   async init() {
     await this.fetchData();
-    console.log(this.AllIngredients);
+
+    this.Recipes.forEach((Recipe) => new Card(Recipe));
+
     const IngredientsSelect = new Select(this.AllIngredients, BLUE);
     const DevicesSelect = new Select(this.AllAppliance, GREEN);
     const ToolsSelect = new Select(this.AllUstensils, RED);

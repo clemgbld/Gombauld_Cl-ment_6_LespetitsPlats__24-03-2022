@@ -202,6 +202,8 @@
     position: absolute;
     transform: translateY(6.6rem);
 
+    z-index: 99;
+
     width: 100%;
 
     display: flex;
@@ -277,13 +279,18 @@
     padding: 2rem;
   }
 
+  &__title {
+    width: 100%;
+    max-width: 24rem;
+  }
+
   &__info {
     @include flex-container(0);
     justify-content: space-between;
     width: 100%;
     font-size: 1.8rem;
     font-weight: 400;
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
   }
 
   &__clock {
@@ -296,7 +303,8 @@
   }
 
   &__main {
-    @include flex-container(0);
+    display: flex;
+    gap: 1rem;
     justify-content: space-between;
     width: 100%;
 
@@ -308,10 +316,10 @@
     justify-content: center;
     flex-direction: column;
     gap: 0.5rem;
+    width: 50%;
   }
 
   &__description {
-    width: 100%;
-    max-width: 17.1rem;
+    width: 50%;
   }
 }
