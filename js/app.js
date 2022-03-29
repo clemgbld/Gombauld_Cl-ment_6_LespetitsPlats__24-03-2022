@@ -4,6 +4,7 @@ import { recipes } from "./data/recipes.js";
 import Recipe from "./models/Recipe.js";
 // types
 import { BLUE, GREEN, RED } from "./types/colorTypes.js";
+import { ADD, SUB } from "./types/operationsTypes.js";
 
 // templates
 import Select from "./templates/select.js";
@@ -13,6 +14,8 @@ import Search from "./templates/Search.js";
 
 // Subject
 import FilterSubject from "./observers/FilterSubject.js";
+import FilterByTagsSubject from "./observers/FilterByTagsSubject.js";
+import UpdateTagsSubject from "./observers/UpdateTagsSubject.js";
 
 // algorithm
 import Filter from "./Algorithm/Filter.js";
@@ -22,13 +25,18 @@ class App {
     this.Recipes = [];
     this.RecipesFiltered = [];
     this.AllIngredients = [];
+    this.ingredientsFiltered = [];
     this.AllAppliance = [];
+    this.appliancesFiltered = [];
     this.AllUstensils = [];
+    this.ustentilsFiltered = [];
     this.searchTerm = "";
 
     this.CardContainer = new CardContainer();
 
     this.FilterSubject = new FilterSubject();
+    this.FilterByTagsSubject = new FilterByTagsSubject();
+    this.UpdateTagsSubject = new UpdateTagsSubject();
 
     this.Filter = new Filter();
   }
@@ -42,6 +50,12 @@ class App {
     this.CardContainer.clearContainer();
 
     if (!isSearchTermLongerThan3) return;
+  }
+
+  filterRecipesByTags(tag, color, operation) {
+    console.log("tag", tag);
+    console.log("color", color);
+    console.log("operation", operation);
   }
 
   getAllIngredients(recipes) {
@@ -84,11 +98,28 @@ class App {
     await this.fetchData();
 
     this.FilterSubject.subscribe(this);
+    this.FilterByTagsSubject.subscribe(this);
 
-    const IngredientsSelect = new Select(this.AllIngredients, BLUE);
-    const DevicesSelect = new Select(this.AllAppliance, GREEN);
-    const ToolsSelect = new Select(this.AllUstensils, RED);
+    const IngredientsSelect = new Select(
+      this.AllIngredients,
+      BLUE,
+      this.FilterByTagsSubject
+    );
+    const DevicesSelect = new Select(
+      this.AllAppliance,
+      GREEN,
+      this.FilterByTagsSubject
+    );
+    const ToolsSelect = new Select(
+      this.AllUstensils,
+      RED,
+      this.FilterByTagsSubject
+    );
     const SearchBar = new Search(this.FilterSubject);
+
+    [IngredientsSelect, DevicesSelect, ToolsSelect].forEach((Select) =>
+      this.UpdateTagsSubject.subscribe(Select)
+    );
   }
 }
 

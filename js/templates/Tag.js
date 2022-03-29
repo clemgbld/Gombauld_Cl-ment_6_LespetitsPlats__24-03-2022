@@ -1,15 +1,20 @@
+import { SUB } from "../types/operationsTypes.js";
+
 class Tag {
-  constructor(tagName, type) {
+  constructor(tagName, type, FilterByTagsSubject) {
     this.tagName = tagName;
     this.type = type;
     this.$container = document.querySelector(".tags");
     this.$btn;
     this.$tag;
 
+    this.FilterByTagsSubject = FilterByTagsSubject;
+
     this.init();
   }
 
   deleteTag() {
+    this.FilterByTagsSubject.fire(this.tagName, this.type, SUB);
     this.$tag.remove();
   }
 

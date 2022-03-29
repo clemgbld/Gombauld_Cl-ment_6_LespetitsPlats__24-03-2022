@@ -1,7 +1,8 @@
 import Tag from "./Tag.js";
+import { ADD } from "../types/operationsTypes.js";
 
 class Select {
-  constructor(tags, type) {
+  constructor(tags, type, FilterByTagsSubject) {
     this.tags = tags;
     this.type = type;
     this.$wrapper = document.querySelector(`.selects__wrapper--${type}`);
@@ -11,6 +12,8 @@ class Select {
     this.$form = this.$wrapper.querySelector(".selects__form");
     this.$title = this.$wrapper.querySelector(".selects__title");
     this.$input = this.$wrapper.querySelector(".selects__search");
+
+    this.FilterByTagsSubject = FilterByTagsSubject;
 
     this.init();
   }
@@ -77,7 +80,8 @@ class Select {
   }
 
   createTag(tag) {
-    const NewTag = new Tag(tag.id, this.type);
+    this.FilterByTagsSubject.fire(tag.id, this.type, ADD);
+    const NewTag = new Tag(tag.id, this.type, this.FilterByTagsSubject);
   }
 
   fillTagsContainer(tags) {
