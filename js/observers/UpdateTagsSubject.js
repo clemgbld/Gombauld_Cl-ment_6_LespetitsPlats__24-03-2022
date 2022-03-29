@@ -10,4 +10,20 @@ class UpdateTagsSubject extends Subject {
   }
 }
 
-export default UpdateTagsSubject;
+export class UpdateIngredientTagsSubject extends UpdateTagsSubject {
+  constructor() {
+    super();
+  }
+}
+
+export class UpdateApplianceTagsSubject extends UpdateTagsSubject {
+  constructor() {
+    super();
+  }
+}
+
+export class UpdateUstensilTagsSubject extends UpdateTagsSubject {
+  constructor() {
+    super();
+  }
+}

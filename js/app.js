@@ -1,3 +1,10 @@
+// helpers
+import {
+  getIngredientTags,
+  getApplianceTags,
+  getUstensilsTags,
+} from "./helpers/getTags.js";
+
 // data
 import { recipes } from "./data/recipes.js";
 // models
@@ -15,10 +22,15 @@ import Search from "./templates/Search.js";
 // Subject
 import FilterSubject from "./observers/FilterSubject.js";
 import FilterByTagsSubject from "./observers/FilterByTagsSubject.js";
-import UpdateTagsSubject from "./observers/UpdateTagsSubject.js";
+import {
+  UpdateIngredientTagsSubject,
+  UpdateApplianceTagsSubject,
+  UpdateUstensilTagsSubject,
+} from "./observers/UpdateTagsSubject.js";
 
 // algorithm
 import Filter from "./Algorithm/Filter.js";
+import FilterByTags from "./Algorithm/FilterByTags.js";
 
 class App {
   constructor() {
@@ -36,48 +48,102 @@ class App {
 
     this.FilterSubject = new FilterSubject();
     this.FilterByTagsSubject = new FilterByTagsSubject();
-    this.UpdateTagsSubject = new UpdateTagsSubject();
+    this.UpdateIngredientTagsSubject = new UpdateIngredientTagsSubject();
+    this.UpdateApplianceTagsSubject = new UpdateApplianceTagsSubject();
+    this.UpdateUstensilTagsSubject = new UpdateUstensilTagsSubject();
+  }
 
-    this.Filter = new Filter();
+  updateTagsContainer(recipes) {
+    const ingredientsTags = getIngredientTags(recipes);
+    this.UpdateIngredientTagsSubject.fire(ingredientsTags);
+
+    const applianceTags = getApplianceTags(recipes);
+    this.UpdateApplianceTagsSubject.fire(applianceTags);
+
+    const ustensilsTags = getUstensilsTags(recipes);
+    this.UpdateUstensilTagsSubject.fire(ustensilsTags);
   }
 
   filterRecipes(searchTerm) {
     const LastSearchTerm = this.searchTerm;
-    console.log(searchTerm);
-    this.searchTerm = searchTerm;
+    this.searchTerm = searchTerm.toLowerCase();
     const isSearchTermLongerThan3 = this.searchTerm.length >= 3;
     const isAddingChars = searchTerm.length > LastSearchTerm;
     this.CardContainer.clearContainer();
 
-    if (!isSearchTermLongerThan3) return;
+    if (!isSearchTermLongerThan3) {
+      this.RecipesFiltered = this.Recipes;
+      return this.updateTagsContainer(this.Recipes);
+    }
+
+    const params = {
+      searchTerm: this.searchTerm,
+      data: this.Recipes,
+      results: this.RecipesFiltered,
+      isAddingChars,
+      ingredientsFiltered: this.ingredientsFiltered,
+      appliancesFiltered: this.appliancesFiltered,
+      ustentilsFiltered: this.ustentilsFiltered,
+    };
+
+    this.RecipesFiltered = Filter.filter(params);
+
+    if (this.RecipesFiltered.length === 0) {
+      this.CardContainer.noResults();
+      return this.updateTagsContainer(this.RecipesFiltered);
+    }
+
+    this.RecipesFiltered.forEach((Recipe) => new Card(Recipe));
+
+    this.updateTagsContainer(this.RecipesFiltered);
   }
 
   filterRecipesByTags(tag, color, operation) {
-    console.log("tag", tag);
-    console.log("color", color);
-    console.log("operation", operation);
+    if (operation === ADD) {
+      if (color === BLUE) {
+        this.ingredientsFiltered.push(tag);
+      }
+      if (color === GREEN) {
+        this.appliancesFiltered.push(tag);
+      }
+      if (color === RED) {
+        this.ustentilsFiltered.push(tag);
+      }
+    }
+
+    if (operation === SUB) {
+      if (color === BLUE) {
+        this.ingredientsFiltered.filter((tagFiltered) => tag !== tagFiltered);
+      }
+      if (color === GREEN) {
+        this.appliancesFiltered.filter((tagFiltered) => tag !== tagFiltered);
+      }
+
+      if (color === RED) {
+        this.ustentilsFiltered.filter((tagFiltered) => tag !== tagFiltered);
+      }
+    }
+
+    const params = {
+      data: this.Recipes,
+      results: this.RecipesFiltered,
+      ingredientsFiltered: this.ingredientsFiltered,
+      appliancesFiltered: this.appliancesFiltered,
+      ustentilsFiltered: this.ustentilsFiltered,
+      operation,
+    };
   }
 
   getAllIngredients(recipes) {
-    this.AllIngredients = [
-      ...new Set(
-        recipes
-          .map((recipe) => recipe.ingredients)
-          .flat()
-          .map((ingredient) => ingredient.ingredient)
-          .flat()
-      ),
-    ];
+    this.AllIngredients = getIngredientTags(recipes);
   }
 
   getAllAppliance(recipes) {
-    this.AllAppliance = [...new Set(recipes.map((Recipe) => Recipe.appliance))];
+    this.AllAppliance = getApplianceTags(recipes);
   }
 
   getAllUstensils(recipes) {
-    this.AllUstensils = [
-      ...new Set(recipes.map((Recipe) => Recipe.ustensils).flat()),
-    ];
+    this.AllUstensils = getUstensilsTags(recipes);
   }
 
   async fetchData() {
@@ -116,10 +182,9 @@ class App {
       this.FilterByTagsSubject
     );
     const SearchBar = new Search(this.FilterSubject);
-
-    [IngredientsSelect, DevicesSelect, ToolsSelect].forEach((Select) =>
-      this.UpdateTagsSubject.subscribe(Select)
-    );
+    this.UpdateIngredientTagsSubject.subscribe(IngredientsSelect);
+    this.UpdateApplianceTagsSubject.subscribe(DevicesSelect);
+    this.UpdateUstensilTagsSubject.subscribe(ToolsSelect);
   }
 }
 
