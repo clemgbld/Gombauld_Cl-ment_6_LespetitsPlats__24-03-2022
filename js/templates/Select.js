@@ -27,11 +27,15 @@ class Select {
     const forms = document.querySelectorAll(".selects__form");
 
     wrappers.forEach((wrapper) => (wrapper.classList = "selects__wrapper"));
-    tagsContainers.forEach((tagsContainer) =>
+    tagsContainers.forEach((tagsContainer) => {
       !tagsContainer.classList.contains("hidden")
         ? tagsContainer.classList.add("hidden")
-        : ""
-    );
+        : "";
+
+      if (tagsContainer.classList.contains("selects__tags--expended")) {
+        tagsContainer.classList.remove("selects__tags--expended");
+      }
+    });
     buttons.forEach((btn) => (btn.classList = "selects__icon"));
     titles.forEach((title) => (title.classList = "selects__title"));
     forms.forEach((form) => (form.classList = "selects__form hidden"));
@@ -44,6 +48,12 @@ class Select {
     this.$btn.classList.remove("selects__icon--rotate");
     this.$title.classList.remove("hidden");
     this.$form.classList.add("hidden");
+    console.log(this.$input.value.length);
+    if (this.$input.value.length > 0) {
+      this.fillTagsWithInput(this.tags);
+    }
+
+    this.$input.value = "";
   }
 
   setActive() {
@@ -81,6 +91,7 @@ class Select {
   }
 
   createTag(tag) {
+    this.$input.value = "";
     this.FilterByTagsSubject.fire(tag.id, this.type, ADD);
     new Tag(tag.id, this.type, this.FilterByTagsSubject);
   }
