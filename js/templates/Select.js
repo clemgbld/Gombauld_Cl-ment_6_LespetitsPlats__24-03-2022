@@ -4,6 +4,7 @@ import { ADD } from "../types/operationsTypes.js";
 class Select {
   constructor(tags, type, FilterByTagsSubject) {
     this.tags = tags;
+    this.tagsFiltered = tags;
     this.type = type;
     this.$wrapper = document.querySelector(`.selects__wrapper--${type}`);
     this.$select = document.querySelector(`.selects__select--${type}`);
@@ -81,10 +82,16 @@ class Select {
 
   createTag(tag) {
     this.FilterByTagsSubject.fire(tag.id, this.type, ADD);
-    const NewTag = new Tag(tag.id, this.type, this.FilterByTagsSubject);
+    new Tag(tag.id, this.type, this.FilterByTagsSubject);
   }
 
   fillTagsContainer(tags) {
+    this.tags = tags;
+
+    this.fillTagsWithInput(tags);
+  }
+
+  fillTagsWithInput(tags) {
     const tagsList = tags.map(
       (word) =>
         `<li class="selects__tag selects__tag--${this.type}" id="${word}">${word}</li>`
@@ -110,7 +117,7 @@ class Select {
     );
 
     const fillTagsContainer = () => {
-      this.fillTagsContainer(tags);
+      this.fillTagsWithInput(tags);
     };
 
     fillTagsContainer();

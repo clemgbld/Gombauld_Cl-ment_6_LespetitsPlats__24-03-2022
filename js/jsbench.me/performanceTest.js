@@ -1795,10 +1795,8 @@ for (let i = 0; i < recipes.length; i++) {
       const ingredient = recipe.ingredients[counter].ingredient;
 
       if (ingredient.toLowerCase().includes(searchTerm.toLowerCase())) {
-        if (isNotTags) {
-          filteredRecipes.push(recipe);
-          break;
-        }
+        filteredRecipes.push(recipe);
+        break;
       }
       counter++;
     }
