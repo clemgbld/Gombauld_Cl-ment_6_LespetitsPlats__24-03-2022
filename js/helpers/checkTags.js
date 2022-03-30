@@ -4,19 +4,22 @@ export function checkTags(
   appliancesFiltered,
   ustentilsFiltered
 ) {
+  let isCorrect = true;
+
   if (ingredientsFiltered.length > 0) {
     ingredientsFiltered.forEach((ingredient) => {
       const isValid = recipe.ingredients.some(
         (item) => item.ingredient.toLowerCase() === ingredient.toLowerCase()
       );
-      if (!isValid) return false;
+
+      if (!isValid) return (isCorrect = false);
     });
   }
 
   if (appliancesFiltered.length > 0) {
     appliancesFiltered.forEach((appliance) => {
-      if (appliance.lowerCase() !== recipe.appliance) {
-        return false;
+      if (appliance.toLowerCase() !== recipe.appliance.toLowerCase()) {
+        return (isCorrect = false);
       }
     });
   }
@@ -24,11 +27,11 @@ export function checkTags(
   if (ustentilsFiltered.length > 0) {
     ustentilsFiltered.forEach((ustensil) => {
       const isValid = recipe.ustensils.some(
-        (item) => item.toLowerCase() === ustensil.toLowerCase
+        (item) => item.toLowerCase() === ustensil.toLowerCase()
       );
-      if (!isValid) return false;
+      if (!isValid) return (isCorrect = false);
     });
   }
 
-  return true;
+  return isCorrect;
 }

@@ -1,5 +1,5 @@
 import chooseArrayToFilter from "../helpers/chooseArrayToFilter.js";
-import { checkTags } from "../helpers/checkTags.js"
+import { checkTags } from "../helpers/checkTags.js";
 
 class Filter {
   static filter(params) {
@@ -11,14 +11,8 @@ class Filter {
       ingredientsFiltered,
       appliancesFiltered,
       ustentilsFiltered,
+      isNotTags,
     } = params;
-
-    const isNotTags =
-      [
-        ingredientsFiltered.length,
-        appliancesFiltered.length,
-        ustentilsFiltered.length,
-      ].reduce((acc, cur) => acc + cur, 0) === 0;
 
     const recipes = chooseArrayToFilter(data, results, isAddingChars);
 
@@ -59,6 +53,16 @@ class Filter {
           return true;
         }
         return false;
+      }
+
+      if (!isNotTags) {
+        if (
+          !recipe.ingredients.find((ingredient) =>
+            ingredient.ingredient.toLowerCase().includes(searchTerm)
+          )
+        ) {
+          return false;
+        }
       }
 
       const isTagsValid = checkTags(
