@@ -1,3 +1,12 @@
+// helpers
+import {
+  getIngredientTags,
+  getApplianceTags,
+  getUstensilsTags,
+} from "./helpers/getTags.js";
+
+import { removeDuplicate } from "./helpers/removeDuplicate.js";
+
 // data
 import { recipes } from "./data/recipes.js";
 // models
@@ -5,6 +14,7 @@ import Recipe from "./models/Recipe.js";
 // types
 import { BLUE, GREEN, RED } from "./types/colorTypes.js";
 import { ADD, SUB } from "./types/operationsTypes.js";
+import { INPUT, TAGS } from "./types/searchTypes.js";
 
 // templates
 import Select from "./templates/select.js";
@@ -15,10 +25,15 @@ import Search from "./templates/Search.js";
 // Subject
 import FilterSubject from "./observers/FilterSubject.js";
 import FilterByTagsSubject from "./observers/FilterByTagsSubject.js";
-import UpdateTagsSubject from "./observers/UpdateTagsSubject.js";
+import {
+  UpdateIngredientTagsSubject,
+  UpdateApplianceTagsSubject,
+  UpdateUstensilTagsSubject,
+} from "./observers/UpdateTagsSubject.js";
 
 // algorithm
 import Filter from "./Algorithm/Filter.js";
+import FilterByTags from "./Algorithm/FilterByTags.js";
 
 class App {
   constructor() {
@@ -36,48 +51,207 @@ class App {
 
     this.FilterSubject = new FilterSubject();
     this.FilterByTagsSubject = new FilterByTagsSubject();
-    this.UpdateTagsSubject = new UpdateTagsSubject();
+    this.UpdateIngredientTagsSubject = new UpdateIngredientTagsSubject();
+    this.UpdateApplianceTagsSubject = new UpdateApplianceTagsSubject();
+    this.UpdateUstensilTagsSubject = new UpdateUstensilTagsSubject();
+  }
 
-    this.Filter = new Filter();
+  updateTagsContainer(recipes) {
+    const ingredientsTags = getIngredientTags(recipes);
+
+    if (this.ingredientsFiltered.length === 0) {
+      this.UpdateIngredientTagsSubject.fire(ingredientsTags);
+    }
+
+    if (this.ingredientsFiltered.length > 0) {
+      const ingredientsTagsWDuplicate = [
+        ...ingredientsTags,
+        ...this.ingredientsFiltered,
+      ];
+      const ingredientsTagsPurged = removeDuplicate(ingredientsTagsWDuplicate);
+      this.UpdateIngredientTagsSubject.fire(ingredientsTagsPurged);
+    }
+
+    const applianceTags = getApplianceTags(recipes);
+
+    if (this.appliancesFiltered.length === 0) {
+      this.UpdateApplianceTagsSubject.fire(applianceTags);
+    }
+
+    if (this.appliancesFiltered.length > 0) {
+      const applianceTagsWDuplicate = [
+        ...applianceTags,
+        ...this.appliancesFiltered,
+      ];
+      const applianceTagsPurged = removeDuplicate(applianceTagsWDuplicate);
+      this.UpdateApplianceTagsSubject.fire(applianceTagsPurged);
+    }
+
+    const ustensilsTags = getUstensilsTags(recipes);
+    if (this.ustentilsFiltered.length === 0) {
+      this.UpdateUstensilTagsSubject.fire(ustensilsTags);
+    }
+
+    if (this.ustentilsFiltered.length > 0) {
+      const ustensilsTagsWDuplicate = [
+        ...ustensilsTags,
+        ...this.ustentilsFiltered,
+      ];
+      const ustensilsTagsPurged = removeDuplicate(ustensilsTagsWDuplicate);
+      this.UpdateUstensilTagsSubject.fire(ustensilsTagsPurged);
+    }
+  }
+
+  renderRecipes(params, searchTypes) {
+    this.RecipesFiltered =
+      searchTypes === TAGS
+        ? FilterByTags.filter(params)
+        : Filter.filter(params);
+    if (this.RecipesFiltered.length === 0) {
+      this.CardContainer.noResults();
+      return this.updateTagsContainer(this.RecipesFiltered);
+    }
+
+    this.CardContainer.clearContainer();
+
+    this.RecipesFiltered.forEach((Recipe) => new Card(Recipe));
+
+    this.updateTagsContainer(this.RecipesFiltered);
   }
 
   filterRecipes(searchTerm) {
     const LastSearchTerm = this.searchTerm;
-    console.log(searchTerm);
-    this.searchTerm = searchTerm;
+    this.searchTerm = searchTerm.toLowerCase();
     const isSearchTermLongerThan3 = this.searchTerm.length >= 3;
     const isAddingChars = searchTerm.length > LastSearchTerm;
+    const isNotTags =
+      [
+        this.ingredientsFiltered.length,
+        this.appliancesFiltered.length,
+        this.ustentilsFiltered.length,
+      ].reduce((acc, cur) => acc + cur, 0) === 0;
+
+    if (!isSearchTermLongerThan3 && !isNotTags) {
+      const params = {
+        data: this.Recipes,
+        results: this.RecipesFiltered,
+        ingredientsFiltered: this.ingredientsFiltered,
+        appliancesFiltered: this.appliancesFiltered,
+        ustentilsFiltered: this.ustentilsFiltered,
+        operation: SUB,
+        searchTerm: this.searchTerm,
+      };
+      return this.renderRecipes(params, TAGS);
+    }
+
     this.CardContainer.clearContainer();
 
-    if (!isSearchTermLongerThan3) return;
+    if (!isSearchTermLongerThan3) {
+      this.RecipesFiltered = this.Recipes;
+      return this.updateTagsContainer(this.Recipes);
+    }
+
+    const params = {
+      searchTerm: this.searchTerm,
+      data: this.Recipes,
+      results: this.RecipesFiltered,
+      isAddingChars,
+      ingredientsFiltered: this.ingredientsFiltered,
+      appliancesFiltered: this.appliancesFiltered,
+      ustentilsFiltered: this.ustentilsFiltered,
+      isNotTags,
+    };
+
+    this.renderRecipes(params, INPUT);
   }
 
   filterRecipesByTags(tag, color, operation) {
-    console.log("tag", tag);
-    console.log("color", color);
-    console.log("operation", operation);
+    if (operation === ADD) {
+      if (color === BLUE) {
+        this.ingredientsFiltered.push(tag);
+      }
+      if (color === GREEN) {
+        this.appliancesFiltered.push(tag);
+      }
+      if (color === RED) {
+        this.ustentilsFiltered.push(tag);
+      }
+    }
+
+    if (operation === SUB) {
+      if (color === BLUE) {
+        this.ingredientsFiltered = this.ingredientsFiltered.filter(
+          (tagFiltered) => tag !== tagFiltered
+        );
+      }
+      if (color === GREEN) {
+        this.appliancesFiltered = this.appliancesFiltered.filter(
+          (tagFiltered) => tag !== tagFiltered
+        );
+      }
+
+      if (color === RED) {
+        this.ustentilsFiltered = this.ustentilsFiltered.filter(
+          (tagFiltered) => tag !== tagFiltered
+        );
+      }
+    }
+
+    const isNotTags =
+      [
+        this.ingredientsFiltered.length,
+        this.appliancesFiltered.length,
+        this.ustentilsFiltered.length,
+      ].reduce((acc, cur) => acc + cur, 0) === 0;
+
+    if (isNotTags) {
+      const isSearchTermLessThan3 = this.searchTerm < 3;
+
+      if (isSearchTermLessThan3) {
+        console.log("?");
+
+        this.CardContainer.clearContainer();
+        this.RecipesFiltered = this.Recipes;
+        return this.updateTagsContainer(this.Recipes);
+      }
+
+      const params = {
+        searchTerm: this.searchTerm,
+        data: this.Recipes,
+        results: this.RecipesFiltered,
+        isAddingChars: false,
+        ingredientsFiltered: this.ingredientsFiltered,
+        appliancesFiltered: this.appliancesFiltered,
+        ustentilsFiltered: this.ustentilsFiltered,
+        isNotTags,
+      };
+
+      return this.renderRecipes(params, INPUT);
+    }
+
+    const params = {
+      data: this.Recipes,
+      results: this.RecipesFiltered,
+      ingredientsFiltered: this.ingredientsFiltered,
+      appliancesFiltered: this.appliancesFiltered,
+      ustentilsFiltered: this.ustentilsFiltered,
+      operation,
+      searchTerm: this.searchTerm,
+    };
+
+    this.renderRecipes(params, TAGS);
   }
 
   getAllIngredients(recipes) {
-    this.AllIngredients = [
-      ...new Set(
-        recipes
-          .map((recipe) => recipe.ingredients)
-          .flat()
-          .map((ingredient) => ingredient.ingredient)
-          .flat()
-      ),
-    ];
+    this.AllIngredients = getIngredientTags(recipes);
   }
 
   getAllAppliance(recipes) {
-    this.AllAppliance = [...new Set(recipes.map((Recipe) => Recipe.appliance))];
+    this.AllAppliance = getApplianceTags(recipes);
   }
 
   getAllUstensils(recipes) {
-    this.AllUstensils = [
-      ...new Set(recipes.map((Recipe) => Recipe.ustensils).flat()),
-    ];
+    this.AllUstensils = getUstensilsTags(recipes);
   }
 
   async fetchData() {
@@ -117,10 +291,9 @@ class App {
     );
     const SearchBar = new Search(this.FilterSubject);
     console.log(SearchBar);
-
-    [IngredientsSelect, DevicesSelect, ToolsSelect].forEach((Select) =>
-      this.UpdateTagsSubject.subscribe(Select)
-    );
+    this.UpdateIngredientTagsSubject.subscribe(IngredientsSelect);
+    this.UpdateApplianceTagsSubject.subscribe(DevicesSelect);
+    this.UpdateUstensilTagsSubject.subscribe(ToolsSelect);
   }
 }
 

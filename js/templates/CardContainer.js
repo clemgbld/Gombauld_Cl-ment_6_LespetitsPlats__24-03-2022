@@ -9,7 +9,7 @@ class CardContainer {
 
   noResults() {
     this.$container.innerHTML =
-      "Aucune recette ne correspond à vos critères de recherche. Vous pouvez chercher « tarte aux pommes », « poisson », etc...";
+      '<p class="recipes__no-results">Aucune recette ne correspond à vos critères de recherche. Vous pouvez chercher « tarte aux pommes », « poisson », etc...</p>';
   }
 }
 
