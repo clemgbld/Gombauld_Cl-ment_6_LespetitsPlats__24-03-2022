@@ -16,10 +16,14 @@ class Filter {
 
     const recipes = chooseArrayToFilter(data, results, isAddingChars);
 
-    return recipes.filter((recipe) => {
+    const filteredRecipes = [];
+
+    for (let i = 0; i < recipes.length; i++) {
+      const recipe = recipes[i];
       if (recipe.description.toLowerCase().includes(searchTerm)) {
         if (isNotTags) {
-          return true;
+          filteredRecipes.push(recipe);
+          continue;
         }
         const isTagsValid = checkTags(
           recipe,
@@ -27,12 +31,14 @@ class Filter {
           appliancesFiltered,
           ustentilsFiltered
         );
-        if (isTagsValid) return true;
-        return false;
-      }
-      if (recipe.name.toLowerCase().includes(searchTerm)) {
+        if (isTagsValid) {
+          filteredRecipes.push(recipe);
+        }
+        continue;
+      } else if (recipe.name.toLowerCase().includes(searchTerm)) {
         if (isNotTags) {
-          return true;
+          filteredRecipes.push(recipe);
+          continue;
         }
         const isTagsValid = checkTags(
           recipe,
@@ -40,40 +46,39 @@ class Filter {
           appliancesFiltered,
           ustentilsFiltered
         );
-        if (isTagsValid) return true;
-        return false;
-      }
 
-      if (isNotTags) {
-        if (
-          recipe.ingredients.find((ingredient) =>
-            ingredient.ingredient.toLowerCase().includes(searchTerm)
-          )
-        ) {
-          return true;
+        if (isTagsValid) {
+          filteredRecipes.push(recipe);
         }
-        return false;
-      }
+        continue;
+      } else {
+        let counter = 0;
 
-      if (!isNotTags) {
-        if (
-          !recipe.ingredients.find((ingredient) =>
-            ingredient.ingredient.toLowerCase().includes(searchTerm)
-          )
-        ) {
-          return false;
+        while (counter < recipe.ingredients.length) {
+          const ingredient = recipe.ingredients[counter].ingredient;
+
+          if (ingredient.toLowerCase().includes(searchTerm.toLowerCase())) {
+            if (isNotTags) {
+              filteredRecipes.push(recipe);
+              break;
+            }
+            const isTagsValid = checkTags(
+              recipe,
+              ingredientsFiltered,
+              appliancesFiltered,
+              ustentilsFiltered
+            );
+            if (isTagsValid) {
+              filteredRecipes.push(recipe);
+            }
+            break;
+          }
+          counter++;
         }
       }
+    }
 
-      const isTagsValid = checkTags(
-        recipe,
-        ingredientsFiltered,
-        appliancesFiltered,
-        ustentilsFiltered
-      );
-      if (isTagsValid) return true;
-      return false;
-    });
+    return filteredRecipes;
   }
 }
 
