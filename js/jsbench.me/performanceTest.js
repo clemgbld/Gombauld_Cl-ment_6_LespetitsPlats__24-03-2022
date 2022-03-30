@@ -1790,3 +1790,5 @@ const filteredRecipes = recipes.filter((recipe) => {
     return true;
   return false;
 });
+
+console.log(filteredRecipes);

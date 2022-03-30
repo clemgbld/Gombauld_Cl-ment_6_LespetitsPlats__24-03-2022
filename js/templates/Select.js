@@ -4,6 +4,7 @@ import { ADD } from "../types/operationsTypes.js";
 class Select {
   constructor(tags, type, FilterByTagsSubject) {
     this.tags = tags;
+    this.tagsFiltered = tags;
     this.type = type;
     this.$wrapper = document.querySelector(`.selects__wrapper--${type}`);
     this.$select = document.querySelector(`.selects__select--${type}`);
@@ -26,11 +27,15 @@ class Select {
     const forms = document.querySelectorAll(".selects__form");
 
     wrappers.forEach((wrapper) => (wrapper.classList = "selects__wrapper"));
-    tagsContainers.forEach((tagsContainer) =>
+    tagsContainers.forEach((tagsContainer) => {
       !tagsContainer.classList.contains("hidden")
         ? tagsContainer.classList.add("hidden")
-        : ""
-    );
+        : "";
+
+      if (tagsContainer.classList.contains("selects__tags--expended")) {
+        tagsContainer.classList.remove("selects__tags--expended");
+      }
+    });
     buttons.forEach((btn) => (btn.classList = "selects__icon"));
     titles.forEach((title) => (title.classList = "selects__title"));
     forms.forEach((form) => (form.classList = "selects__form hidden"));
@@ -43,6 +48,12 @@ class Select {
     this.$btn.classList.remove("selects__icon--rotate");
     this.$title.classList.remove("hidden");
     this.$form.classList.add("hidden");
+    console.log(this.$input.value.length);
+    if (this.$input.value.length > 0) {
+      this.fillTagsWithInput(this.tags);
+    }
+
+    this.$input.value = "";
   }
 
   setActive() {
@@ -80,11 +91,18 @@ class Select {
   }
 
   createTag(tag) {
+    this.$input.value = "";
     this.FilterByTagsSubject.fire(tag.id, this.type, ADD);
-    const NewTag = new Tag(tag.id, this.type, this.FilterByTagsSubject);
+    new Tag(tag.id, this.type, this.FilterByTagsSubject);
   }
 
   fillTagsContainer(tags) {
+    this.tags = tags;
+
+    this.fillTagsWithInput(tags);
+  }
+
+  fillTagsWithInput(tags) {
     const tagsList = tags.map(
       (word) =>
         `<li class="selects__tag selects__tag--${this.type}" id="${word}">${word}</li>`
@@ -110,7 +128,7 @@ class Select {
     );
 
     const fillTagsContainer = () => {
-      this.fillTagsContainer(tags);
+      this.fillTagsWithInput(tags);
     };
 
     fillTagsContainer();

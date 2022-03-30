@@ -289,7 +289,8 @@ class App {
       RED,
       this.FilterByTagsSubject
     );
-    const SearchBar = new Search(this.FilterSubject);
+    new Search(this.FilterSubject);
+
     this.UpdateIngredientTagsSubject.subscribe(IngredientsSelect);
     this.UpdateApplianceTagsSubject.subscribe(DevicesSelect);
     this.UpdateUstensilTagsSubject.subscribe(ToolsSelect);

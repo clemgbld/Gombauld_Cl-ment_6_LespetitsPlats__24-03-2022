@@ -7,13 +7,14 @@ class Tag {
     this.$container = document.querySelector(".tags");
     this.$btn;
     this.$tag;
-
+    this.inputs = document.querySelectorAll(".selects__search");
     this.FilterByTagsSubject = FilterByTagsSubject;
 
     this.init();
   }
 
   deleteTag() {
+    this.inputs.forEach(($input) => ($input.value = ""));
     this.FilterByTagsSubject.fire(this.tagName, this.type, SUB);
     this.$tag.remove();
   }
