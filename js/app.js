@@ -116,6 +116,7 @@ class App {
       this.FilterByTagsSubject
     );
     const SearchBar = new Search(this.FilterSubject);
+    console.log(SearchBar);
 
     [IngredientsSelect, DevicesSelect, ToolsSelect].forEach((Select) =>
       this.UpdateTagsSubject.subscribe(Select)
